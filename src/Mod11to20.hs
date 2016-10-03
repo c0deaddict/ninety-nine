@@ -46,3 +46,44 @@ encodeDirect = foldl reduce []
 
 prop_encodeDirect :: Eq a => [a] -> Bool
 prop_encodeDirect xs = encodeDirect xs == encodeModified xs
+
+--
+-- Problem 14: Duplicate the elements of a list.
+dupli :: [a] -> [a]
+dupli []     = []
+dupli (x:xs) = x : x : dupli xs
+
+prop_dupli :: [a] -> Bool
+prop_dupli xs = length (dupli xs) == 2 * length xs
+
+--
+-- Problem 15: Replicate the elements of a list a given number of times.
+repli :: [a] -> Int -> [a]
+repli _ 0 = []
+repli [] _ = []
+repli xs 1 = xs
+repli (x:xs) n = rept x n ++ repli xs n
+  where
+    rept x 0 = []
+    rept x n = x : rept x (n - 1)
+
+prop_repli :: [a] -> Property
+prop_repli xs =
+  forAll (choose (1, 10)) $ \n ->
+    length (repli xs n) == n * length xs
+
+--
+-- Problem 16: Drop every N'th element from a list.
+dropEvery :: [a] -> Int -> [a]
+dropEvery xs n = chunksOf n xs >>= take (n - 1)
+
+chunksOf :: Int -> [a] -> [[a]]
+chunksOf _ [] = []
+chunksOf 0 xs = error "Zero is not a size"
+chunksOf n xs = prefix : chunksOf n suffix
+  where (prefix, suffix) = splitAt n xs
+
+prop_dropEvery :: [a] -> Property
+prop_dropEvery xs = not (null xs) ==>
+  forAll (choose (1, length xs)) $ \n ->
+    length (dropEvery xs n) == length xs - length xs `div` n
