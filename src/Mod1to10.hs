@@ -1,3 +1,5 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Mod1to10 where
 
 import           Test.QuickCheck
@@ -130,3 +132,6 @@ pack list@(x:_) = prefix : pack suffix
 encode :: Eq a => [a] -> [(Int, a)]
 encode = map rle . pack
   where rle prefix@(x:_) = (length prefix, x)
+
+return []
+runTests = $quickCheckAll
