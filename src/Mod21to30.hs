@@ -5,7 +5,7 @@ module Mod21to30 where
 import           Mod11to20
 import           Mod1to10
 
-import           Data.List
+import           Data.List       hiding (group)
 import           System.Random
 import           Test.QuickCheck
 
@@ -130,6 +130,34 @@ countCombs n k
   | n < k     = 0
   | k == 0    = 1
   | otherwise = n * countCombs (n - 1) (k - 1)
+
+
+--
+-- Problem 27: Group the elements of a set into disjoint subsets.
+--
+-- a) In how many ways can a group of 9 people work in 3 disjoint subgroups of
+--    2, 3 and 4 persons? Write a function that generates all the possibilities
+--    and returns them in a list.
+--
+-- b) Generalize the above predicate in a way that we can specify a list of
+--    group sizes and the predicate will return a list of groups
+group :: Eq a => [Int] -> [a] -> [[[a]]]
+group [] _ = []
+group _ [] = []
+group [k] members = map (:[]) $ ordCombs k members
+group (k:xs) members = do
+  comb <- ordCombs k members
+  rest <- group xs (filter (`notElem` comb) members)
+  return (comb : rest)
+
+ordCombs :: Int -> [a] -> [[a]]
+ordCombs k _      | k <= 0 = []
+ordCombs _ []     = []
+ordCombs 1 xs     = map (: []) xs
+ordCombs k (x:xs) = ((:) x <$> tailsOfLength (k - 1) xs) ++ ordCombs k xs
+  where
+    tailsOfLength n xs = filter (minLength n) $ take n <$> tails xs
+    minLength n xs = length xs >= n
 
 
 return []
