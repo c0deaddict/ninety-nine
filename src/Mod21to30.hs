@@ -159,6 +159,24 @@ ordCombs k (x:xs) = ((:) x <$> tailsOfLength (k - 1) xs) ++ ordCombs k xs
     tailsOfLength n xs = filter (minLength n) $ take n <$> tails xs
     minLength n xs = length xs >= n
 
+--
+-- Problem 28: Sorting a list of lists according to length of sublists
+--
+-- a) We suppose that a list contains elements that are lists themselves. The
+--    objective is to sort the elements of this list according to their length.
+--    E.g. short lists first, longer lists later, or vice versa.
+lsort :: [[a]] -> [[a]]
+lsort = sortBy (\a b -> compare (length a) (length b))
+
+-- b) Again, we suppose that a list contains elements that are lists themselves.
+--    But this time the objective is to sort the elements of this list according
+--    to their length frequency; i.e., in the default, where sorting is done
+--    ascendingly, lists with rare lengths are placed first, others with a more
+--    frequent length come later.
+lfsort :: [[a]] -> [[a]]
+lfsort xs = sortBy (\a b -> compare (freq a) (freq b)) xs where
+  freq x = length $ filter (length x ==) (length <$> xs)
+
 
 return []
 runTests = $quickCheckAll
